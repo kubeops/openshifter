@@ -18,8 +18,11 @@ package controller
 
 import (
 	"context"
+	"fmt"
+	"kubeops.dev/openshifter/internal/tracker"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	corev1 "k8s.io/api/core/v1"
+	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -46,16 +49,48 @@ type NamespaceReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.0/pkg/reconcile
 func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	var ns core.Namespace
+	if err := r.Get(ctx, req.NamespacedName, &ns); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
 
+	curUid, foundUid := ns.Annotations[tracker.KeyUid]
+	_, foundFsGroup := ns.Annotations[tracker.KeyFsGroup]
+	if foundUid && foundFsGroup {
+		return ctrl.Result{}, nil
+	}
+
+	if !foundUid {
+		nuUid := tracker.Uid.Add(tracker.UidRange)
+		curUid = fmt.Sprintf("%d/%d", nuUid, tracker.UidRange)
+	}
+
+	result, err := controllerutil.CreateOrPatch(ctx, r.Client, &ns, func() error {
+		if ns.Annotations == nil {
+			ns.Annotations = map[string]string{}
+		}
+		if !foundUid {
+			ns.Annotations[tracker.KeyUid] = curUid
+		}
+		if !foundFsGroup {
+			ns.Annotations[tracker.KeyFsGroup] = curUid
+		}
+		return nil
+	})
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	if result != controllerutil.OperationResultNone {
+		log.Info("Annotated Namespace")
+	}
 	return ctrl.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *NamespaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&corev1.Namespace{}).
+		For(&core.Namespace{}).
 		Complete(r)
 }

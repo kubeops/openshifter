@@ -19,7 +19,11 @@ package main
 import (
 	"crypto/tls"
 	"flag"
+	corev1 "k8s.io/api/core/v1"
+	"kubeops.dev/openshifter/internal/tracker"
+	webhook2 "kubeops.dev/openshifter/internal/webhook"
 	"os"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -142,13 +146,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&controller.PodReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Pod")
+	err = tracker.Init(mgr.GetAPIReader())
+	if err != nil {
+		setupLog.Error(err, "unable to initialize uid tracker")
 		os.Exit(1)
 	}
+
 	if err = (&controller.NamespaceReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
@@ -156,6 +159,23 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Namespace")
 		os.Exit(1)
 	}
+
+	if err := builder.WebhookManagedBy(mgr).
+		For(&corev1.Namespace{}).
+		WithDefaulter(&webhook2.NamespaceAnnotator{}).
+		Complete(); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Namespace")
+		os.Exit(1)
+	}
+
+	if err := builder.WebhookManagedBy(mgr).
+		For(&corev1.Pod{}).
+		WithValidator(&webhook2.PodValidator{}).
+		Complete(); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Pod")
+		os.Exit(1)
+	}
+
 	// +kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
