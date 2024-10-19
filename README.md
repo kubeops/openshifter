@@ -23,6 +23,12 @@ kubebuilder create webhook --group core --version v1 --kind Pod --programmatic-v
 kubebuilder create webhook --group core --version v1 --kind Namespace --defaulting
 ```
 
+### Install cert-manager
+
+```sh
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.2/cert-manager.yaml
+```
+
 ### To Deploy on the cluster
 **Build and push your image to the location specified by `IMG`:**
 

@@ -177,19 +177,6 @@ func main() {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Pod")
 		os.Exit(1)
 	}
-
-	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
-		if err = (&corev1.Pod{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "Pod")
-			os.Exit(1)
-		}
-	}
-	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
-		if err = (&corev1.Namespace{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "Namespace")
-			os.Exit(1)
-		}
-	}
 	// +kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
