@@ -8,7 +8,6 @@ rules:
   - ""
   resources:
   - namespaces
-  - pods
   verbs:
   - create
   - delete
@@ -21,14 +20,12 @@ rules:
   - ""
   resources:
   - namespaces/finalizers
-  - pods/finalizers
   verbs:
   - update
 - apiGroups:
   - ""
   resources:
   - namespaces/status
-  - pods/status
   verbs:
   - get
   - patch
