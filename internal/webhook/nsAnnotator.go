@@ -9,7 +9,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
-// +kubebuilder:webhook:path=/mutate--v1-namespace,mutating=true,failurePolicy=fail,groups="",resources=namespaces,verbs=create;update,versions=v1,admissionReviewVersions=v1,sideEffects=None,name=mpod.kb.io
+// +kubebuilder:webhook:path=/mutate--v1-namespace,mutating=true,failurePolicy=fail,sideEffects=None,groups="",resources=namespaces,verbs=create;update,versions=v1,name=mnamespace.kb.io,admissionReviewVersions=v1
 
 // NamespaceAnnotator annotates Namespaces
 type NamespaceAnnotator struct{}

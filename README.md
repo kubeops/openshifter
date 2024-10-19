@@ -18,6 +18,9 @@
 kubebuilder init --domain ""
 kubebuilder create api --group core --version v1 --kind Pod
 kubebuilder create api --group core --version v1 --kind Namespace
+
+kubebuilder create webhook --group core --version v1 --kind Pod --programmatic-validation
+kubebuilder create webhook --group core --version v1 --kind Namespace --defaulting
 ```
 
 ### To Deploy on the cluster
