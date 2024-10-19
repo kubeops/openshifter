@@ -63,7 +63,7 @@ func Init(kc client.Reader) error {
 		curUid = 1000100000
 	}
 	Uid.Store(curUid)
-	
+
 	return nil
 }
 

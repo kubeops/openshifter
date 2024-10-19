@@ -1,0 +1,124 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"cert-manager"}}
+    creationTimestamp: "2024-10-19T17:47:39Z"
+    labels:
+      kubernetes.io/metadata.name: cert-manager
+    name: cert-manager
+    resourceVersion: "368"
+    uid: e1c68c6c-d4bc-4915-98f6-52a79645a278
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      openshift.io/sa.scc.supplemental-groups: 1000440000/10000
+      openshift.io/sa.scc.uid-range: 1000440000/10000
+    creationTimestamp: "2024-10-19T17:47:30Z"
+    labels:
+      kubernetes.io/metadata.name: default
+    name: default
+    resourceVersion: "1063"
+    uid: 736c184d-a175-4934-a1c5-2fdbd916130d
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      openshift.io/sa.scc.supplemental-groups: 1000450000/10000
+      openshift.io/sa.scc.uid-range: 1000450000/10000
+    creationTimestamp: "2024-10-19T17:47:30Z"
+    labels:
+      kubernetes.io/metadata.name: kube-node-lease
+    name: kube-node-lease
+    resourceVersion: "1064"
+    uid: f124c1b0-0f14-4648-8ae4-bb3185afaddf
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      openshift.io/sa.scc.supplemental-groups: 1000460000/10000
+      openshift.io/sa.scc.uid-range: 1000460000/10000
+    creationTimestamp: "2024-10-19T17:47:29Z"
+    labels:
+      kubernetes.io/metadata.name: kube-public
+    name: kube-public
+    resourceVersion: "1065"
+    uid: 049be2de-77ce-413d-9133-25c0da68272c
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    creationTimestamp: "2024-10-19T17:47:29Z"
+    labels:
+      kubernetes.io/metadata.name: kube-system
+    name: kube-system
+    resourceVersion: "10"
+    uid: df1699c9-642d-489f-9422-e0fc898b706c
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"local-path-storage"}}
+    creationTimestamp: "2024-10-19T17:47:33Z"
+    labels:
+      kubernetes.io/metadata.name: local-path-storage
+    name: local-path-storage
+    resourceVersion: "266"
+    uid: 18c37ea3-232d-4376-a641-5e0cff17c7c6
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"labels":{"app.kubernetes.io/managed-by":"kustomize","app.kubernetes.io/name":"openshifter","control-plane":"controller-manager"},"name":"openshifter-system"}}
+    creationTimestamp: "2024-10-19T17:51:56Z"
+    labels:
+      app.kubernetes.io/managed-by: kustomize
+      app.kubernetes.io/name: openshifter
+      control-plane: controller-manager
+      kubernetes.io/metadata.name: openshifter-system
+    name: openshifter-system
+    resourceVersion: "938"
+    uid: 405b6e5a-8896-4d6c-aa4c-2bfe9aad7774
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+kind: List
+metadata:
+  resourceVersion: ""

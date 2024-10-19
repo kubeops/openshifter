@@ -18,7 +18,7 @@ import (
 
 // PodValidator validates Pods
 type PodValidator struct {
-	kc client.Reader
+	client.Reader
 }
 
 // validate admits a pod if a specific annotation exists.
@@ -35,7 +35,7 @@ func (v *PodValidator) validate(ctx context.Context, obj runtime.Object) (admiss
 
 	log.Info("Validating Pod")
 
-	uidStart, uidRange, err := tracker.GetUid(v.kc, pod.Namespace)
+	uidStart, uidRange, err := tracker.GetUid(v.Reader, pod.Namespace)
 	if err != nil {
 		return nil, err
 	} else if uidStart == tracker.UidNone {

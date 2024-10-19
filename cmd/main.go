@@ -172,7 +172,7 @@ func main() {
 
 	if err := builder.WebhookManagedBy(mgr).
 		For(&corev1.Pod{}).
-		WithValidator(&webhook2.PodValidator{}).
+		WithValidator(&webhook2.PodValidator{Reader: mgr.GetClient()}).
 		Complete(); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Pod")
 		os.Exit(1)
