@@ -59,10 +59,11 @@ func Init(kc client.Reader) error {
 		if curUid != curFsGroupUid {
 			return fmt.Errorf("runAsUser %d and fsGroup %d uid range does not match", curUid, curFsGroupUid)
 		}
-		Uid.Store(curUid)
 	} else {
 		curUid = 1000100000
 	}
+	Uid.Store(curUid)
+	
 	return nil
 }
 
