@@ -35,7 +35,7 @@ func Init(kc client.Reader) error {
 		return err
 	}
 
-	var curUid, curFsGroupUid int64
+	var curUid, curFsGroupUid int64 = -1, -1
 
 	for _, ns := range list.Items {
 		if v, ok := ns.Annotations[KeyUid]; ok {
@@ -55,11 +55,13 @@ func Init(kc client.Reader) error {
 		}
 	}
 
-	if curUid > 0 {
+	if curUid > -1 {
 		if curUid != curFsGroupUid {
 			return fmt.Errorf("runAsUser %d and fsGroup %d uid range does not match", curUid, curFsGroupUid)
 		}
 		Uid.Store(curUid)
+	} else {
+		curUid = 1000100000
 	}
 	return nil
 }
