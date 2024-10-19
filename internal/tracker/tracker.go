@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	core "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strconv"
 	"strings"
@@ -14,10 +15,12 @@ const (
 	KeyUid     = "openshift.io/sa.scc.uid-range"
 	KeyFsGroup = "openshift.io/sa.scc.supplemental-groups"
 	UidRange   = 10000
+	UidNone    = -1
 )
 
 var (
-	Uid atomic.Int64
+	Uid        atomic.Int64
+	NSSkipList = sets.New[string]("kube-system", "local-path-storage")
 )
 
 /*
@@ -59,4 +62,36 @@ func Init(kc client.Reader) error {
 		Uid.Store(curUid)
 	}
 	return nil
+}
+
+func GetUid(kc client.Reader, ns string) (int64, int64, error) {
+	var obj core.Namespace
+	err := kc.Get(context.TODO(), client.ObjectKey{Name: ns}, &obj)
+	if err != nil {
+		return UidNone, UidNone, err
+	}
+
+	curUid, foundUid := obj.Annotations[KeyUid]
+	curFsGroupUid, foundFsGroup := obj.Annotations[KeyFsGroup]
+	if !foundUid && !foundFsGroup {
+		return UidNone, UidNone, nil
+	}
+	if curUid != curFsGroupUid {
+		return UidNone, UidNone, fmt.Errorf("runAsUser %d and fsGroup %d uid range does not match", curUid, curFsGroupUid)
+	}
+
+	strUid, strRange, ok := strings.Cut(curUid, "/")
+	if !ok {
+		return UidNone, UidNone, fmt.Errorf("%s annotation value is not in <start>/<range> format", KeyUid)
+	}
+
+	uid, err := strconv.ParseInt(strUid, 10, 64)
+	if err != nil {
+		return UidNone, UidNone, fmt.Errorf("%s annotation start uid is not an interger", KeyUid)
+	}
+	uidRange, err := strconv.ParseInt(strRange, 10, 64)
+	if err != nil {
+		return UidNone, UidNone, fmt.Errorf("%s annotation range is not an interger", KeyUid)
+	}
+	return uid, uidRange, nil
 }

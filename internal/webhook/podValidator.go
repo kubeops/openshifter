@@ -2,9 +2,12 @@ package webhook
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"kubeops.dev/openshifter/internal/tracker"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	corev1 "k8s.io/api/core/v1"
+	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -14,24 +17,78 @@ import (
 // +kubebuilder:webhook:path=/validate--v1-pod,mutating=false,failurePolicy=fail,groups="",resources=pods,verbs=create;update,versions=v1,name=vpod.kb.io
 
 // PodValidator validates Pods
-type PodValidator struct{}
+type PodValidator struct {
+	kc client.Reader
+}
 
 // validate admits a pod if a specific annotation exists.
 func (v *PodValidator) validate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
 	log := logf.FromContext(ctx)
-	pod, ok := obj.(*corev1.Pod)
+	pod, ok := obj.(*core.Pod)
 	if !ok {
 		return nil, fmt.Errorf("expected a Pod but got a %T", obj)
 	}
 
-	log.Info("Validating Pod")
-	key := "example-mutating-admission-webhook"
-	anno, found := pod.Annotations[key]
-	if !found {
-		return nil, fmt.Errorf("missing annotation %s", key)
+	if tracker.NSSkipList.Has(pod.Namespace) {
+		return nil, nil
 	}
-	if anno != "foo" {
-		return nil, fmt.Errorf("annotation %s did not have value %q", key, "foo")
+
+	log.Info("Validating Pod")
+
+	uidStart, uidRange, err := tracker.GetUid(v.kc, pod.Namespace)
+	if err != nil {
+		return nil, err
+	} else if uidStart == tracker.UidNone {
+		return nil, nil
+	}
+
+	var runAsUser, runAsGroup, fsGroup int64 = -1, -1, -1
+	if pod.Spec.SecurityContext != nil {
+		if pod.Spec.SecurityContext.RunAsUser != nil {
+			runAsUser = *pod.Spec.SecurityContext.RunAsUser
+		}
+		if pod.Spec.SecurityContext.RunAsGroup != nil {
+			runAsGroup = *pod.Spec.SecurityContext.RunAsGroup
+		}
+		if pod.Spec.SecurityContext.FSGroup != nil {
+			fsGroup = *pod.Spec.SecurityContext.FSGroup
+		}
+	}
+
+	if runAsUser == tracker.UidNone {
+		return nil, errors.New("runAsUser is not set")
+	} else if runAsUser < uidStart || runAsUser > uidStart+uidRange {
+		return nil, fmt.Errorf("runAsUser %d must be within range %d/%d", runAsUser, uidStart, uidRange)
+	}
+
+	if runAsGroup != tracker.UidNone && (runAsGroup < uidStart || runAsGroup > uidStart+uidRange) {
+		return nil, fmt.Errorf("runAsGroup %d must be within range %d/%d", runAsGroup, uidStart, uidRange)
+	}
+
+	if fsGroup != tracker.UidNone && (fsGroup < uidStart || fsGroup > uidStart+uidRange) {
+		return nil, fmt.Errorf("fsGroup %d must be within range %d/%d", fsGroup, uidStart, uidRange)
+	}
+
+	for _, c := range pod.Spec.Containers {
+		cUid, cGid := runAsUser, runAsGroup
+		if c.SecurityContext != nil {
+			if c.SecurityContext.RunAsUser != nil {
+				cUid = *c.SecurityContext.RunAsUser
+			}
+			if c.SecurityContext.RunAsGroup != nil {
+				cGid = *c.SecurityContext.RunAsGroup
+			}
+		}
+
+		if cUid == tracker.UidNone {
+			return nil, fmt.Errorf("container %s runAsUser is not set", c.Name)
+		} else if cUid < uidStart || cUid > uidStart+uidRange {
+			return nil, fmt.Errorf("container %s runAsUser %d must be within range %d/%d", c.Name, cUid, uidStart, uidRange)
+		}
+
+		if cGid != tracker.UidNone && (cGid < uidStart || cGid > uidStart+uidRange) {
+			return nil, fmt.Errorf("container %s runAsGroup %d must be within range %d/%d", c.Name, cGid, uidStart, uidRange)
+		}
 	}
 
 	return nil, nil

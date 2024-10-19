@@ -51,6 +51,10 @@ type NamespaceReconciler struct {
 func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
 
+	if tracker.NSSkipList.Has(req.Name) {
+		return ctrl.Result{}, nil
+	}
+
 	var ns core.Namespace
 	if err := r.Get(ctx, req.NamespacedName, &ns); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)

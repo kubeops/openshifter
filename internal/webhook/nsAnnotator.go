@@ -21,6 +21,10 @@ func (a *NamespaceAnnotator) Default(ctx context.Context, obj runtime.Object) er
 		return fmt.Errorf("expected a Namespace but got a %T", obj)
 	}
 
+	if tracker.NSSkipList.Has(ns.Name) {
+		return nil
+	}
+
 	curUid, foundUid := ns.Annotations[tracker.KeyUid]
 	_, foundFsGroup := ns.Annotations[tracker.KeyFsGroup]
 	if foundUid && foundFsGroup {
