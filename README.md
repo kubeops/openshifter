@@ -12,6 +12,14 @@
 - kubectl version v1.11.3+.
 - Access to a Kubernetes v1.11.3+ cluster.
 
+### Generate project
+
+```sh
+kubebuilder init --domain ""
+kubebuilder create api --group core --version v1 --kind Pod
+kubebuilder create api --group core --version v1 --kind Namespace
+```
+
 ### To Deploy on the cluster
 **Build and push your image to the location specified by `IMG`:**
 
