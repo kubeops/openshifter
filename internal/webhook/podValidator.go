@@ -2,7 +2,6 @@ package webhook
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"kubeops.dev/openshifter/internal/tracker"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -55,9 +54,7 @@ func (v *PodValidator) validate(ctx context.Context, obj runtime.Object) (admiss
 		}
 	}
 
-	if runAsUser == tracker.UidNone {
-		return nil, errors.New("runAsUser is not set")
-	} else if runAsUser < uidStart || runAsUser > uidStart+uidRange {
+	if runAsUser != tracker.UidNone && (runAsUser < uidStart || runAsUser > uidStart+uidRange) {
 		return nil, fmt.Errorf("runAsUser %d must be within range %d/%d", runAsUser, uidStart, uidRange)
 	}
 
