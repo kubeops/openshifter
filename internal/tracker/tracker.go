@@ -20,7 +20,7 @@ const (
 
 var (
 	Uid        atomic.Int64
-	NSSkipList = sets.New[string]("kube-system", "local-path-storage", "openshifter-system", "cert-manager")
+	NSSkipList = sets.New[string]("kube-system", "local-path-storage", "cert-manager", "openshifter-system", "aceshifter-system")
 )
 
 /*

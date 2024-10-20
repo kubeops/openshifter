@@ -6,12 +6,12 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"cert-manager"}}
-    creationTimestamp: "2024-10-19T17:47:39Z"
+    creationTimestamp: "2024-10-19T18:05:08Z"
     labels:
       kubernetes.io/metadata.name: cert-manager
     name: cert-manager
-    resourceVersion: "368"
-    uid: e1c68c6c-d4bc-4915-98f6-52a79645a278
+    resourceVersion: "307"
+    uid: e3e0ca17-fc0d-4185-888a-741c3695c9a2
   spec:
     finalizers:
     - kubernetes
@@ -23,12 +23,12 @@ items:
     annotations:
       openshift.io/sa.scc.supplemental-groups: 1000440000/10000
       openshift.io/sa.scc.uid-range: 1000440000/10000
-    creationTimestamp: "2024-10-19T17:47:30Z"
+    creationTimestamp: "2024-10-19T18:05:00Z"
     labels:
       kubernetes.io/metadata.name: default
     name: default
-    resourceVersion: "1063"
-    uid: 736c184d-a175-4934-a1c5-2fdbd916130d
+    resourceVersion: "774"
+    uid: 5db7e9d2-7396-4cbd-a781-63cb5b7e5917
   spec:
     finalizers:
     - kubernetes
@@ -40,12 +40,12 @@ items:
     annotations:
       openshift.io/sa.scc.supplemental-groups: 1000450000/10000
       openshift.io/sa.scc.uid-range: 1000450000/10000
-    creationTimestamp: "2024-10-19T17:47:30Z"
+    creationTimestamp: "2024-10-19T18:05:00Z"
     labels:
       kubernetes.io/metadata.name: kube-node-lease
     name: kube-node-lease
-    resourceVersion: "1064"
-    uid: f124c1b0-0f14-4648-8ae4-bb3185afaddf
+    resourceVersion: "775"
+    uid: a74202c2-1f40-44d7-9449-ff1702e1cfa3
   spec:
     finalizers:
     - kubernetes
@@ -57,12 +57,12 @@ items:
     annotations:
       openshift.io/sa.scc.supplemental-groups: 1000460000/10000
       openshift.io/sa.scc.uid-range: 1000460000/10000
-    creationTimestamp: "2024-10-19T17:47:29Z"
+    creationTimestamp: "2024-10-19T18:05:00Z"
     labels:
       kubernetes.io/metadata.name: kube-public
     name: kube-public
-    resourceVersion: "1065"
-    uid: 049be2de-77ce-413d-9133-25c0da68272c
+    resourceVersion: "776"
+    uid: ad536657-cfc8-41d5-b4c8-c7b84b7d9aff
   spec:
     finalizers:
     - kubernetes
@@ -71,12 +71,12 @@ items:
 - apiVersion: v1
   kind: Namespace
   metadata:
-    creationTimestamp: "2024-10-19T17:47:29Z"
+    creationTimestamp: "2024-10-19T18:05:00Z"
     labels:
       kubernetes.io/metadata.name: kube-system
     name: kube-system
-    resourceVersion: "10"
-    uid: df1699c9-642d-489f-9422-e0fc898b706c
+    resourceVersion: "11"
+    uid: 6950727d-1605-44e8-af3c-5d29ff3d7eb4
   spec:
     finalizers:
     - kubernetes
@@ -88,12 +88,12 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"local-path-storage"}}
-    creationTimestamp: "2024-10-19T17:47:33Z"
+    creationTimestamp: "2024-10-19T18:05:03Z"
     labels:
       kubernetes.io/metadata.name: local-path-storage
     name: local-path-storage
-    resourceVersion: "266"
-    uid: 18c37ea3-232d-4376-a641-5e0cff17c7c6
+    resourceVersion: "269"
+    uid: 5377575d-104d-4a3d-9fc3-1478dec51309
   spec:
     finalizers:
     - kubernetes
@@ -105,15 +105,15 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"labels":{"app.kubernetes.io/managed-by":"kustomize","app.kubernetes.io/name":"openshifter","control-plane":"controller-manager"},"name":"openshifter-system"}}
-    creationTimestamp: "2024-10-19T17:51:56Z"
+    creationTimestamp: "2024-10-19T18:06:14Z"
     labels:
       app.kubernetes.io/managed-by: kustomize
       app.kubernetes.io/name: openshifter
       control-plane: controller-manager
       kubernetes.io/metadata.name: openshifter-system
     name: openshifter-system
-    resourceVersion: "938"
-    uid: 405b6e5a-8896-4d6c-aa4c-2bfe9aad7774
+    resourceVersion: "665"
+    uid: c1f2a959-f1cf-418d-b6db-8968d2146c62
   spec:
     finalizers:
     - kubernetes
