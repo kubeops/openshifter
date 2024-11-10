@@ -3,12 +3,14 @@ package webhook
 import (
 	"context"
 	"fmt"
-	"kubeops.dev/openshifter/internal/tracker"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	core "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
-
+	"k8s.io/apiserver/pkg/authentication/user"
+	"k8s.io/apiserver/pkg/authorization/authorizer"
+	"kubeops.dev/openshifter/internal/tracker"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
@@ -18,6 +20,7 @@ import (
 // PodValidator validates Pods
 type PodValidator struct {
 	client.Reader
+	authorizer.Authorizer
 }
 
 // validate admits a pod if a specific annotation exists.
@@ -33,6 +36,27 @@ func (v *PodValidator) validate(ctx context.Context, obj runtime.Object) (admiss
 	}
 
 	log.Info("Validating Pod")
+
+	// https://examples.openshift.pub/deploy/scc-anyuid/
+	attrs := authorizer.AttributesRecord{
+		User: &user.DefaultInfo{
+			Name:   fmt.Sprintf("system:serviceaccount:%s:%s", pod.Namespace, pod.Name),
+			Groups: []string{"system:serviceaccounts"},
+		},
+		Verb:            "use",
+		Namespace:       pod.Namespace,
+		APIGroup:        "security.openshift.io",
+		Resource:        "securitycontextconstraints",
+		Name:            "anyuid",
+		ResourceRequest: true,
+	}
+	decision, _, err := v.Authorizer.Authorize(ctx, attrs)
+	if err != nil {
+		return nil, errors.NewInternalError(err)
+	}
+	if decision == authorizer.DecisionAllow {
+		return nil, nil
+	}
 
 	uidStart, uidRange, err := tracker.GetUid(v.Reader, pod.Namespace)
 	if err != nil {

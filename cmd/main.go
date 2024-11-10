@@ -22,6 +22,7 @@ import (
 	"os"
 
 	corev1 "k8s.io/api/core/v1"
+	"kmodules.xyz/authorizer"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 
 	"kubeops.dev/openshifter/internal/tracker"
@@ -147,12 +148,15 @@ func main() {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
+	ctx := ctrl.SetupSignalHandler()
 
 	err = tracker.Init(mgr.GetAPIReader())
 	if err != nil {
 		setupLog.Error(err, "unable to initialize uid tracker")
 		os.Exit(1)
 	}
+
+	a := authorizer.NewForManagerOrDie(ctx, mgr)
 
 	if err = (&controller.NamespaceReconciler{
 		Client: mgr.GetClient(),
@@ -172,7 +176,7 @@ func main() {
 
 	if err := builder.WebhookManagedBy(mgr).
 		For(&corev1.Pod{}).
-		WithValidator(&webhook2.PodValidator{Reader: mgr.GetClient()}).
+		WithValidator(&webhook2.PodValidator{Reader: mgr.GetClient(), Authorizer: a}).
 		Complete(); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Pod")
 		os.Exit(1)
@@ -189,7 +193,7 @@ func main() {
 	}
 
 	setupLog.Info("starting manager")
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+	if err := mgr.Start(ctx); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
