@@ -168,7 +168,7 @@ func main() {
 
 	if err := builder.WebhookManagedBy(mgr).
 		For(&corev1.Namespace{}).
-		WithDefaulter(&webhook2.NamespaceAnnotator{}).
+		WithDefaulter(&webhook2.NamespaceAnnotator{Mapper: mgr.GetRESTMapper()}).
 		Complete(); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Namespace")
 		os.Exit(1)
@@ -176,7 +176,7 @@ func main() {
 
 	if err := builder.WebhookManagedBy(mgr).
 		For(&corev1.Pod{}).
-		WithValidator(&webhook2.PodValidator{Reader: mgr.GetClient(), Authorizer: a}).
+		WithValidator(&webhook2.PodValidator{Reader: mgr.GetClient(), Authorizer: a, Mapper: mgr.GetRESTMapper()}).
 		Complete(); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Pod")
 		os.Exit(1)

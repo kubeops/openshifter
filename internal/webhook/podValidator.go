@@ -6,9 +6,11 @@ import (
 
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/authentication/user"
 	"k8s.io/apiserver/pkg/authorization/authorizer"
+	clustermeta "kmodules.xyz/client-go/cluster"
 	"kubeops.dev/openshifter/internal/tracker"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -21,6 +23,7 @@ import (
 type PodValidator struct {
 	client.Reader
 	authorizer.Authorizer
+	Mapper meta.RESTMapper
 }
 
 // validate admits a pod if a specific annotation exists.
@@ -32,6 +35,9 @@ func (v *PodValidator) validate(ctx context.Context, obj runtime.Object) (admiss
 	}
 
 	if tracker.NSSkipList.Has(pod.Namespace) {
+		return nil, nil
+	}
+	if !clustermeta.IsOpenShiftManaged(v.Mapper) {
 		return nil, nil
 	}
 
