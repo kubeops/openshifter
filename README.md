@@ -34,6 +34,17 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 
 ```sh
 make docker-build docker-push IMG=ghcr.io/appscodeci/openshifter:latest
+
+#multi-arch image
+
+docker buildx create \
+  --name container \
+  --driver=docker-container
+
+## Build & push image
+docker build --push \
+  --builder container --platform linux/amd64,linux/arm64 \
+  -t ghcr.io/appscodeci/openshifter:latest .
 ```
 
 **NOTE:** This image ought to be published in the personal registry you specified.
