@@ -3,12 +3,13 @@ package tracker
 import (
 	"context"
 	"fmt"
-	core "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/util/sets"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"strconv"
 	"strings"
 	"sync/atomic"
+
+	core "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
